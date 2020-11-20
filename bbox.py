@@ -111,6 +111,40 @@ class Bbox():
         cropped = cv2.warpPerspective(img, M, (crop_width, crop_height))
         return cropped
 
+    def get_w_h(self):
+        bbox = self.get_reordered_bbox()
+        w = np.linalg.norm(bbox[0] - bbox[1])
+        h = np.linalg.norm(bbox[0] - bbox[3])
+        return (w, h)
+
+    def compute_angle(self):
+        '''
+            Under the coordinate system like this:
+            ------------------->x
+            |
+            |
+            |
+            |
+            v
+            y
+
+            If we put the rotation center in this box,
+            how much angle should we rotate this box clockwisely to make it axis aligned?
+
+            NOTE:
+                cv2.getRotationMatrix2D()'s angle parameter is rotating COUNTER-clockwisely.
+        '''
+        box = self.get_reordered_bbox()
+        w, h = box[1] - box[0]
+        success = True
+        if w == 0:
+            angle = 0.
+            success = False
+        else:
+            angle = -math.atan(h / w)
+            angle = angle * 180 / math.pi # convert it to degree
+        return angle, success
+
 if __name__ == "__main__":
     np_bbox = np.array([[98, 99], [3, 5], [5, 3], [100, 97]])
     bbox = Bbox(np_bbox)
