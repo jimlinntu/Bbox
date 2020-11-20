@@ -51,8 +51,7 @@ class Bbox():
             distance = lambda point: point.sum()
 
         distances = [distance(point) for point in self.np_bbox]
-        # if there exist two points with almost the same distance
-        # we will consider the axis aligned width and height
+        # handle the case when there exist two points with almost the same distance
         startidx = np.argmin(distances)
         for i, dist in enumerate(distances):
             if i != startidx and math.isclose(distances[startidx], dist):
